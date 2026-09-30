@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Screening System</title>
+</head>
+
+<body>
+
+    <h1>AI Resume Screening & Job Recommendation System</h1>
+
+    <h2>Upload Your Resume</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="resume" accept=".pdf" required>
+        <button type="submit">Upload Resume</button>
+    </form>
+
+    {% if extracted_text %}
+        <h2>Extracted Resume Text</h2>
+
+        <pre>{{ extracted_text }}</pre>
+    {% endif %}
+
+</body>
+</html>
