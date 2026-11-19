@@ -5,23 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Resume Screening System</title>
 </head>
-
 <body>
-
     <h1>AI Resume Screening & Job Recommendation System</h1>
 
-    <h2>Upload Your Resume</h2>
-
-    <form method="POST" enctype="multipart/form-data">
-        <input type="file" name="resume" accept=".pdf" required>
-        <button type="submit">Upload Resume</button>
-    </form>
-
-    {% if extracted_text %}
-        <h2>Extracted Resume Text</h2>
-
-        <pre>{{ extracted_text }}</pre>
+    {% if error %}
+        <p style="color: red;"><strong>Error:</strong> {{ error }}</p>
     {% endif %}
 
+    <form method="POST" enctype="multipart/form-data">
+        <p>
+            <label><strong>1. Upload Resume (PDF):</strong></label><br>
+            <input type="file" name="resume" accept=".pdf" required>
+        </p>
+        <p>
+            <label><strong>2. Required Skills (comma-separated):</strong></label><br>
+            <textarea name="job_skills" rows="3" cols="60" placeholder="e.g., Python, Machine Learning, NLP, SQL"></textarea>
+        </p>
+        <p>
+            <label><strong>3. Education Requirements:</strong></label><br>
+            <input type="text" name="job_education" size="60" placeholder="e.g., Bachelor's in Computer Science">
+        </p>
+        <p>
+            <label><strong>4. Experience & Responsibilities:</strong></label><br>
+            <textarea name="job_experience" rows="3" cols="60" placeholder="e.g., 1+ years building NLP pipelines and REST APIs"></textarea>
+        </p>
+        <button type="submit">Analyze Match</button>
+    </form>
+
+    {% if result %}
+        <hr>
+        <h2>Match Results ({{ result.match_category }})</h2>
+        <ul>
+            <li><strong>Overall Field-Aware Match Score:</strong> {{ result.match_percentage }}% ({{ result.match_score }})</li>
+            <li><strong>Skills Similarity (50% weight):</strong> {{ result.skills_score if result.skills_score is not none else "N/A" }}</li>
+            <li><strong>Education Similarity (20% weight):</strong> {{ result.education_score if result.education_score is not none else "N/A" }}</li>
+            <li><strong>Experience Similarity (30% weight):</strong> {{ result.experience_score if result.experience_score is not none else "N/A" }}</li>
+            <li><strong>Missing Required Skills:</strong> {{ result.missing_skills | join(", ") if result.missing_skills else "None detected" }}</li>
+        </ul>
+    {% endif %}
+
+    {% if extracted_text %}
+        <hr>
+        <h3>Extracted Resume Text</h3>
+        <pre>{{ extracted_text }}</pre>
+    {% endif %}
 </body>
 </html>
