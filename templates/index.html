@@ -4,50 +4,302 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Resume Screening System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
-    <h1>AI Resume Screening & Job Recommendation System</h1>
+<div class="container">
+
+    <header>
+        <h1>AI Resume Screening & Job Recommendation System</h1>
+        <p>Analyze your resume against job requirements</p>
+    </header>
+
+    <section class="upload-section">
+
+        <h2>Upload Your Resume</h2>
+
+        <form method="POST" enctype="multipart/form-data">
+
+            <label for="resume">Upload Resume (PDF or TXT)</label>
+            <input type="file" id="resume" name="resume"
+                   accept=".pdf,.txt" required>
+
+            <label for="job_description">Job Description</label>
+
+            <textarea
+                id="job_description"
+                name="job_description"
+                rows="8"
+                placeholder="Paste the job description here..."
+                required>{{ job_description or '' }}</textarea>
+
+            <button type="submit">Analyze Resume</button>
+
+        </form>
+
+    </section>
+
 
     {% if error %}
-        <p style="color: red;"><strong>Error:</strong> {{ error }}</p>
+        <section class="results-section">
+            <p class="error">{{ error }}</p>
+        </section>
     {% endif %}
 
-    <form method="POST" enctype="multipart/form-data">
-        <p>
-            <label><strong>1. Upload Resume (PDF):</strong></label><br>
-            <input type="file" name="resume" accept=".pdf" required>
-        </p>
-        <p>
-            <label><strong>2. Required Skills (comma-separated):</strong></label><br>
-            <textarea name="job_skills" rows="3" cols="60" placeholder="e.g., Python, Machine Learning, NLP, SQL"></textarea>
-        </p>
-        <p>
-            <label><strong>3. Education Requirements:</strong></label><br>
-            <input type="text" name="job_education" size="60" placeholder="e.g., Bachelor's in Computer Science">
-        </p>
-        <p>
-            <label><strong>4. Experience & Responsibilities:</strong></label><br>
-            <textarea name="job_experience" rows="3" cols="60" placeholder="e.g., 1+ years building NLP pipelines and REST APIs"></textarea>
-        </p>
-        <button type="submit">Analyze Match</button>
-    </form>
 
-    {% if result %}
-        <hr>
-        <h2>Match Results ({{ result.match_category }})</h2>
-        <ul>
-            <li><strong>Overall Field-Aware Match Score:</strong> {{ result.match_percentage }}% ({{ result.match_score }})</li>
-            <li><strong>Skills Similarity (50% weight):</strong> {{ result.skills_score if result.skills_score is not none else "N/A" }}</li>
-            <li><strong>Education Similarity (20% weight):</strong> {{ result.education_score if result.education_score is not none else "N/A" }}</li>
-            <li><strong>Experience Similarity (30% weight):</strong> {{ result.experience_score if result.experience_score is not none else "N/A" }}</li>
-            <li><strong>Missing Required Skills:</strong> {{ result.missing_skills | join(", ") if result.missing_skills else "None detected" }}</li>
-        </ul>
+    {% if analysis %}
+
+    <section class="results-section">
+
+        <h2>Resume Analysis Dashboard</h2>
+
+        <!-- CONTACT INFORMATION -->
+        {% if analysis.contact_info and (analysis.contact_info.emails or analysis.contact_info.phones) %}
+        <div class="contact-info">
+            <h3>Detected Contact Information</h3>
+            {% if analysis.contact_info.emails %}
+                <p><strong>Email:</strong> {{ analysis.contact_info.emails | join(', ') }}</p>
+            {% endif %}
+            {% if analysis.contact_info.phones %}
+                <p><strong>Phone:</strong> {{ analysis.contact_info.phones | join(', ') }}</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+
+        <!-- SCORE CARDS GRID -->
+        <div class="score-grid">
+
+            <!-- OVERALL SKILL COMPATIBILITY -->
+            <div class="score-card">
+                <h3>Overall Skill Compatibility</h3>
+
+                <div class="score-number">
+                    {{ analysis.match_score }}%
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill"
+                         style="width: {{ analysis.match_score }}%;">
+                    </div>
+                </div>
+
+                <span class="match-label">
+                    {{ analysis.match_score }}% Skill Match
+                </span>
+            </div>
+
+            <!-- SKILL GAP -->
+            <div class="score-card">
+                <h3>Skill Gap</h3>
+
+                <div class="score-number">
+                    {{ analysis.missing_percentage }}%
+                </div>
+
+                <p>Percentage of detected job skills not found in the resume</p>
+            </div>
+
+            <!-- TF-IDF TEXT SIMILARITY -->
+            {% if analysis.text_similarity is defined %}
+            <div class="score-card">
+                <h3>Document Text Similarity (TF-IDF)</h3>
+
+                <div class="score-number">
+                    {{ analysis.text_similarity }}%
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill"
+                         style="width: {{ analysis.text_similarity }}%;">
+                    </div>
+                </div>
+
+                <p>Lexical similarity between full resume text and job description</p>
+            </div>
+            {% endif %}
+
+        </div>
+
+
+        <!-- DETECTED RESUME SECTIONS -->
+        {% if analysis.sections %}
+        <div class="resume-sections">
+            <h3>Detected Resume Sections</h3>
+            {% for heading, content in analysis.sections.items() %}
+                <div class="section-block">
+                    <h4>{{ heading | replace('_', ' ') | title }}</h4>
+                    <p>{{ content }}</p>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+
+        <!-- REQUIRED SKILLS -->
+        <h3>Required Skills</h3>
+
+        {% if analysis.required_skills %}
+            <ul class="skill-list">
+                {% for skill in analysis.required_skills %}
+                    <li class="skill-tag">{{ skill }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No standard skills detected in the job description.</p>
+        {% endif %}
+
+
+        <!-- MATCHED SKILLS -->
+        <h3>Matching Skills</h3>
+
+        {% if analysis.matched_skills %}
+            <ul class="skill-list">
+                {% for skill in analysis.matched_skills %}
+                    <li class="skill-tag matched">{{ skill }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No matching skills detected.</p>
+        {% endif %}
+
+
+        <!-- MISSING SKILLS -->
+        <h3>Missing Skills</h3>
+
+        {% if analysis.missing_skills %}
+            <ul class="skill-list">
+                {% for skill in analysis.missing_skills %}
+                    <li class="skill-tag missing">{{ skill }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No missing skills detected.</p>
+        {% endif %}
+
+
+        <!-- EXTRA SKILLS -->
+        <h3>Additional Resume Skills</h3>
+
+        {% if analysis.extra_skills %}
+            <ul class="skill-list">
+                {% for skill in analysis.extra_skills %}
+                    <li class="skill-tag extra">{{ skill }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No additional skills detected.</p>
+        {% endif %}
+
+
+        <!-- SKILL RECOMMENDATIONS -->
+        <div class="recommendations">
+
+            <h3>Skill Improvement Recommendations</h3>
+
+            {% if analysis.missing_skills %}
+                <p>Consider developing these skills:</p>
+                <ul>
+                    {% for skill in analysis.missing_skills %}
+                        <li>{{ skill }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>
+                    All detected skills in the job description
+                    are present in the resume.
+                </p>
+            {% endif %}
+
+        </div>
+
+
+        <!-- TOP JOB RECOMMENDATIONS -->
+        <div class="recommendations">
+
+            <h2>Top Job Recommendations</h2>
+
+            {% if recommendations %}
+
+                {% for job in recommendations %}
+
+                    <div class="job-card">
+
+                        <h3>{{ job.title }}</h3>
+
+                        <p class="company">{{ job.company }}</p>
+
+                        <p>{{ job.description }}</p>
+
+                        <h4>Compatibility: {{ job.score }}%</h4>
+
+                        <div class="progress-bar">
+                            <div class="progress-fill"
+                                 style="width: {{ job.score }}%;">
+                            </div>
+                        </div>
+
+                        <h4>Matching Skills</h4>
+
+                        {% if job.matched_skills %}
+                            <ul class="skill-list">
+                                {% for skill in job.matched_skills %}
+                                    <li class="skill-tag matched">{{ skill }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No matching skills detected.</p>
+                        {% endif %}
+
+                        <h4>Skills to Develop</h4>
+
+                        {% if job.missing_skills %}
+                            <ul class="skill-list">
+                                {% for skill in job.missing_skills %}
+                                    <li class="skill-tag missing">{{ skill }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>All catalogue skills matched.</p>
+                        {% endif %}
+
+                    </div>
+
+                {% endfor %}
+
+            {% else %}
+
+                <p>No job recommendations available.</p>
+
+            {% endif %}
+
+        </div>
+
+
+        <p class="human-review">
+            This tool provides decision-support information only.
+            A human should evaluate the resume and make all
+            hiring-related decisions.
+        </p>
+
+    </section>
+
     {% endif %}
+
 
     {% if extracted_text %}
-        <hr>
-        <h3>Extracted Resume Text</h3>
+
+    <section class="results-section">
+
+        <h2>Extracted Resume Text</h2>
+
         <pre>{{ extracted_text }}</pre>
+
+    </section>
+
     {% endif %}
+
+</div>
 </body>
 </html>

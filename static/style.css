@@ -1,0 +1,136 @@
+/* Error Alert */
+.error {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Contact Information Card */
+.contact-info {
+    background: #f8fafc;
+    border: 1px solid #dbe2ea;
+    border-left: 4px solid #2563eb;
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin-bottom: 22px;
+}
+
+.contact-info h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #1e293b;
+}
+
+.contact-info p {
+    margin: 6px 0;
+    color: #334155;
+}
+
+/* Detected Resume Sections */
+.resume-sections {
+    margin: 25px 0;
+    padding: 20px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+}
+
+.resume-sections > h3 {
+    margin-top: 0;
+    color: #1e293b;
+}
+
+.section-block {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 14px;
+}
+
+.section-block:last-child {
+    margin-bottom: 0;
+}
+
+.section-block h4 {
+    margin: 0 0 8px 0;
+    color: #2563eb;
+    font-size: 16px;
+}
+
+.section-block p {
+    margin: 0;
+    white-space: pre-line;
+    line-height: 1.55;
+    color: #334155;
+    font-size: 14px;
+}
+
+/* Horizontal Skill Tag Pills */
+.skill-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 22px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.skill-tag.matched {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.skill-tag.missing {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.skill-tag.extra {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+/* Score Cards inside Grid */
+.score-grid .score-card {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.score-grid .score-card h3 {
+    margin-top: 0;
+    font-size: 17px;
+    color: #1e293b;
+}
+
+/* Individual Job Recommendation Cards */
+.job-card {
+    background: #ffffff;
+    border: 1px solid #dbeafe;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 16px;
+}
+
+.job-card h3 {
+    margin: 0 0 4px 0;
+    color: #1e3a8a;
+}
+
+.job-card .company {
+    font-weight: 600;
+    color: #64748b;
+    margin-top: 0;
+}
+
+.job-card h4 {
+    margin: 14px 0 8px 0;
+    font-size: 15px;
+    color: #334155;
+}
